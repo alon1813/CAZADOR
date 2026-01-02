@@ -16,7 +16,8 @@ class Jornada extends Model
         'latitud',
         'longitud',
         'datos_climaticos',
-        'comentarios'
+        'comentarios',
+        'imagen_ruta',
     ];
 
     protected $casts = [
