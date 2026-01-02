@@ -45,4 +45,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // Relación: Un usuario tiene muchas armas
+    public function armas()
+    {
+        return $this->hasMany(Arma::class);
+    }
 }
