@@ -28,18 +28,28 @@ class ArmaController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. Validamos los datos (siempre en español los mensajes si quieres personalizarlos)
+        // 1. Validamos (Añadimos reglas para la imagen)
         $datosValidados = $request->validate([
             'nombre' => 'required|string|max:255',
             'tipo' => 'required|string|max:100',
             'calibre' => 'nullable|string|max:50',
             'notas' => 'nullable|string',
+            'imagen' => 'nullable|image|max:3072', // Máx 3MB, solo imágenes
         ]);
 
-        // 2. Creamos el arma asignando el ID del usuario automáticamente
+        // 2. Gestión de la imagen (Si el usuario subió una)
+        if ($request->hasFile('imagen')) {
+            // Guarda la imagen en la carpeta 'storage/app/public/armas'
+            // y nos devuelve la ruta, ej: "armas/foto1.jpg"
+            $rutaImagen = $request->file('imagen')->store('armas', 'public');
+            
+            // Añadimos la ruta a los datos que vamos a guardar
+            $datosValidados['imagen_ruta'] = $rutaImagen;
+        }
+
+        // 3. Crear el arma
         $request->user()->armas()->create($datosValidados);
 
-        // 3. Redirigimos de vuelta (Inertia actualizará la lista sin recargar la página)
         return redirect()->route('armeria.index');
     }
 }

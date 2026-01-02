@@ -51,4 +51,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Arma::class);
     }
+
+    public function jornadas()
+    {
+        return $this->hasMany(Jornada::class);
+    }
 }

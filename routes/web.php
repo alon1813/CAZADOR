@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ArmaController;
 use Inertia\Inertia;
+use App\Http\Controllers\JornadaController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -35,6 +36,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // NUESTRAS RUTAS: Armería
     Route::get('/armeria', [ArmaController::class, 'index'])->name('armeria.index');
     Route::post('/armeria', [ArmaController::class, 'store'])->name('armeria.store');
+
+    Route::get('/diario', [JornadaController::class, 'index'])->name('diario.index');
+    Route::get('/diario/crear', [JornadaController::class, 'create'])->name('diario.create');
+    Route::post('/diario', [JornadaController::class, 'store'])->name('diario.store');
 });
 
 require __DIR__.'/auth.php';
