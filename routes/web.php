@@ -3,22 +3,16 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ArmaController;
 use Inertia\Inertia;
 use App\Http\Controllers\JornadaController;
+use App\Http\Controllers\MercadoController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return Auth::check() ? redirect()->route('dashboard') : redirect()->route('login');
 });
-
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -27,6 +21,9 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
+
+    // Ruta limpia apuntando al controlador
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     // Rutas para el perfil (ya venían con Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -40,6 +37,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/diario', [JornadaController::class, 'index'])->name('diario.index');
     Route::get('/diario/crear', [JornadaController::class, 'create'])->name('diario.create');
     Route::post('/diario', [JornadaController::class, 'store'])->name('diario.store');
+
+    // Rutas para el Mercado
+    Route::get('/mercado', [MercadoController::class, 'index'])->name('mercado.index');
+    Route::post('/mercado', [MercadoController::class, 'store'])->name('mercado.store');
 });
 
 require __DIR__.'/auth.php';

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Jornada;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\DB; // Para usar transacciones
+use Illuminate\Support\Facades\DB; 
 
 class JornadaController extends Controller
 {
