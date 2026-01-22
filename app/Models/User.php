@@ -23,6 +23,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'licencia_caza', 
+        'ubicacion',     
+        'biografia',     
+        'notificaciones_veda', 
+        'perfil_publico', 
     ];
 
     /**

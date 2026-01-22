@@ -14,22 +14,37 @@ use Inertia\Response;
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * Muestra el formulario de perfil con el nuevo diseño.
      */
     public function edit(Request $request): Response
     {
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
+            // Pasamos estadísticas simples para el sidebar
+            'stats' => [
+                'jornadas' => $request->user()->jornadas()->count(),
+                'armas' => $request->user()->armas()->count(),
+            ]
         ]);
     }
 
     /**
-     * Update the user's profile information.
+     * Actualiza la información del perfil.
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+        // Validamos los campos extra manualmente aquí o en ProfileUpdateRequest
         $request->user()->fill($request->validated());
+        
+        // Rellenamos los campos extra que no están en la validación por defecto de Breeze
+        $request->user()->fill($request->only([
+            'licencia_caza', 
+            'ubicacion', 
+            'biografia',
+            'notificaciones_veda',
+            'perfil_publico'
+        ]));
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
@@ -41,7 +56,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Delete the user's account.
+     * Eliminar cuenta (Breeze por defecto).
      */
     public function destroy(Request $request): RedirectResponse
     {

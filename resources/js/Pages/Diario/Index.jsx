@@ -1,5 +1,6 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
+//import { Link } from '@inertiajs/react';
 
 export default function Index({ auth, jornadas }) {
     
@@ -23,18 +24,30 @@ export default function Index({ auth, jornadas }) {
         <div className="bg-background-light dark:bg-background-dark min-h-screen flex flex-col font-display text-slate-900 dark:text-white">
             <Head title="Mis Jornadas" />
 
-            {/* HEADER */}
-            <header className="sticky top-0 z-50 flex items-center justify-between border-b border-border-green bg-background-dark/95 backdrop-blur-sm px-6 py-3 lg:px-10">
+            <header className="...">
                 <div className="flex items-center gap-4">
-                    <span className="material-symbols-outlined text-primary text-3xl">verified_user</span>
-                    <h2 className="text-white text-xl font-bold">HunterLog</h2>
+                    {/* LOGO QUE LLEVA AL INICIO */}
+                    <Link href={route('dashboard')} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                        <span className="material-symbols-outlined text-primary text-3xl">verified_user</span>
+                        <h2 className="text-white text-xl font-bold">HunterLog</h2>
+                    </Link>
                 </div>
-                <nav className="hidden md:flex items-center gap-8">
-                    <Link href={route('armeria.index')} className="text-text-muted hover:text-white transition-colors text-sm font-medium">Mi Armero</Link>
-                    <Link href={route('diario.index')} className="text-primary text-sm font-bold border-b-2 border-primary">Mis Jornadas</Link>
-                </nav>
-                <div className="size-10 rounded-full bg-surface-dark border-2 border-border-green flex items-center justify-center text-white font-bold">
-                     {auth.user.name.charAt(0)}
+                
+                <div className="flex flex-1 justify-end gap-8">
+                    <nav className="hidden md:flex items-center gap-9">
+                        {/* ENLACES CORRECTOS */}
+                        <Link href={route('dashboard')} className="text-white text-sm font-medium hover:text-primary transition-colors">Inicio</Link>
+                        <Link href={route('diario.index')} className="text-white text-sm font-medium hover:text-primary transition-colors">Diario</Link>
+                        <Link href={route('armeria.index')} className="text-white text-sm font-medium hover:text-primary transition-colors">Armería</Link>
+                        <Link href={route('mercado.index')} className="text-white text-sm font-medium hover:text-primary transition-colors">Mercado</Link>
+                    </nav>
+
+                    {/* AVATAR QUE LLEVA AL PERFIL */}
+                    <Link href={route('profile.edit')} className="flex items-center justify-center">
+                        <div className="size-10 rounded-full bg-surface-dark border border-primary flex items-center justify-center text-white font-bold hover:bg-primary hover:text-black transition-colors">
+                            {auth.user.name.charAt(0)}
+                        </div>
+                    </Link>
                 </div>
             </header>
 

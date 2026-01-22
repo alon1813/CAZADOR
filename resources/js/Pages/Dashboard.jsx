@@ -1,11 +1,14 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
+//import { Link } from '@inertiajs/react';
 
 export default function Dashboard({ auth, stats }) {
     return (
         <div className="bg-background-light dark:bg-background-dark min-h-screen text-slate-900 dark:text-white font-display flex overflow-hidden">
             <Head title="Panel de Control" />
 
+            
+            
             {/* SIDEBAR (Escritorio) */}
             <aside className="hidden lg:flex flex-col w-72 border-r border-border-green bg-surface-dark fixed h-full z-10">
                 <div className="p-6 flex flex-col h-full justify-between">

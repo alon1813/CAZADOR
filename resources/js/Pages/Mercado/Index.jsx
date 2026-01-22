@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Head, useForm, Link } from '@inertiajs/react';
+//import { Link } from '@inertiajs/react';
 
 export default function Index({ auth, anuncios, filtros }) {
     const [mostrarModal, setMostrarModal] = useState(false);
@@ -29,27 +30,30 @@ export default function Index({ auth, anuncios, filtros }) {
         <div className="bg-background-light dark:bg-background-dark min-h-screen flex flex-col font-display text-slate-900 dark:text-white overflow-x-hidden">
             <Head title="Mercado" />
 
-            {/* HEADER */}
-            <header className="flex items-center justify-between whitespace-nowrap border-b border-border-dark bg-background-dark px-10 py-3 sticky top-0 z-50">
-                <div className="flex items-center gap-4 text-white">
-                    <span className="material-symbols-outlined text-primary text-3xl">storefront</span>
-                    <h2 className="text-white text-lg font-bold">Mercado de Caza</h2>
+            <header className="...">
+                <div className="flex items-center gap-4">
+                    {/* LOGO QUE LLEVA AL INICIO */}
+                    <Link href={route('dashboard')} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                        <span className="material-symbols-outlined text-primary text-3xl">verified_user</span>
+                        <h2 className="text-white text-xl font-bold">HunterLog</h2>
+                    </Link>
                 </div>
+                
                 <div className="flex flex-1 justify-end gap-8">
-                    <div className="hidden md:flex items-center gap-9">
-                        <Link href={route('diario.index')} className="text-white text-sm font-medium hover:text-primary transition-colors">Jornadas</Link>
-                        <Link href={route('armeria.index')} className="text-white text-sm font-medium hover:text-primary transition-colors">Armero</Link>
-                        <Link href={route('mercado.index')} className="text-primary text-sm font-bold">Mercado</Link>
-                    </div>
-                    <button 
-                        onClick={() => setMostrarModal(true)}
-                        className="flex items-center justify-center rounded-lg h-10 px-4 bg-primary text-[#152211] text-sm font-bold hover:bg-opacity-90 transition-opacity"
-                    >
-                        Publicar Anuncio
-                    </button>
-                    <div className="size-10 rounded-full bg-surface-dark border border-border-dark flex items-center justify-center text-white font-bold">
-                        {auth.user.name.charAt(0)}
-                    </div>
+                    <nav className="hidden md:flex items-center gap-9">
+                        {/* ENLACES CORRECTOS */}
+                        <Link href={route('dashboard')} className="text-white text-sm font-medium hover:text-primary transition-colors">Inicio</Link>
+                        <Link href={route('diario.index')} className="text-white text-sm font-medium hover:text-primary transition-colors">Diario</Link>
+                        <Link href={route('armeria.index')} className="text-white text-sm font-medium hover:text-primary transition-colors">Armería</Link>
+                        <Link href={route('mercado.index')} className="text-white text-sm font-medium hover:text-primary transition-colors">Mercado</Link>
+                    </nav>
+
+                    {/* AVATAR QUE LLEVA AL PERFIL */}
+                    <Link href={route('profile.edit')} className="flex items-center justify-center">
+                        <div className="size-10 rounded-full bg-surface-dark border border-primary flex items-center justify-center text-white font-bold hover:bg-primary hover:text-black transition-colors">
+                            {auth.user.name.charAt(0)}
+                        </div>
+                    </Link>
                 </div>
             </header>
 
