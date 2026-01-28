@@ -6,6 +6,7 @@ use App\Models\Jornada;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB; 
+use App\Services\WeatherService;
 
 class JornadaController extends Controller
 {
@@ -32,7 +33,7 @@ class JornadaController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, WeatherService $weatherService)
     {
         // 1. Validación Avanzada (incluyendo arrays)
         $datos = $request->validate([
@@ -41,7 +42,7 @@ class JornadaController extends Controller
             'latitud' => 'required|numeric',
             'longitud' => 'required|numeric',
             'comentarios' => 'nullable|string',
-            'imagen' => 'nullable|image|max:10240', // Máx 10MB
+            'imagen' => 'nullable|image|max:10240',
             
             // Validación del array de capturas
             'capturas' => 'nullable|array',
@@ -52,15 +53,23 @@ class JornadaController extends Controller
 
         // Usamos una Transacción: Si falla algo al guardar las capturas, 
         // no se guarda la jornada tampoco. Todo o nada.
-        DB::transaction(function () use ($request, $datos) {
+        DB::transaction(function () use ($request, $datos, $weatherService) {
             
-            // A. Gestionar Imagen Principal
+            // 1. Gestionar Imagen
             $rutaImagen = null;
             if ($request->hasFile('imagen')) {
                 $rutaImagen = $request->file('imagen')->store('jornadas', 'public');
             }
 
-            // B. Crear la Jornada
+            // 2. OBTENER CLIMA (NUEVO)
+            // Solo pedimos el clima si la fecha es HOY. 
+            // (La API gratuita no suele dar el histórico de hace 1 mes gratis, solo el actual)
+            $datosClimaticos = null;
+            if ($datos['fecha'] === date('Y-m-d')) {
+                $datosClimaticos = $weatherService->getWeatherData($datos['latitud'], $datos['longitud']);
+            }
+
+            // 3. Crear la Jornada
             $jornada = $request->user()->jornadas()->create([
                 'fecha' => $datos['fecha'],
                 'ubicacion_texto' => $datos['ubicacion_texto'],
@@ -68,21 +77,16 @@ class JornadaController extends Controller
                 'longitud' => $datos['longitud'],
                 'comentarios' => $datos['comentarios'],
                 'imagen_ruta' => $rutaImagen,
+                'datos_climaticos' => $datosClimaticos, // <--- GUARDAMOS EL JSON
             ]);
 
-            // C. Crear las Capturas (Bucle)
+            // 4. Crear Capturas
             if (!empty($request->capturas)) {
                 foreach ($request->capturas as $capturaData) {
-                    // Si el usuario pone cantidad 3, ¿creamos 3 registros o 1 con cantidad 3?
-                    // Tu modelo actual es individual, así que crearemos un registro por cada "bicho"
-                    // O podemos simplificar guardando 1 registro con el campo 'peso' genérico.
-                    
-                    // Opción: Crear tantos registros como diga "cantidad"
                     for ($i = 0; $i < $capturaData['cantidad']; $i++) {
                         $jornada->capturas()->create([
                             'especie' => $capturaData['especie'],
-                            'peso' => $capturaData['peso'], // Peso aproximado individual
-                            //'sexo' => ... (si lo añades al form)
+                            'peso' => $capturaData['peso'],
                         ]);
                     }
                 }

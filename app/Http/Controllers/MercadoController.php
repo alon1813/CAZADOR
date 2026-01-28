@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Anuncio;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AvisoInteresado;
 
 class MercadoController extends Controller
 {
@@ -48,5 +50,31 @@ class MercadoController extends Controller
         $request->user()->anuncios()->create($datos);
 
         return redirect()->back();
+    }
+
+    /**
+     * Envía un correo al dueño del anuncio.
+     */
+    public function contactarVendedor(Request $peticion, $idAnuncio)
+    {
+        $datosValidados = $peticion->validate([
+            'mensaje' => 'required|string|min:10|max:500',
+        ]);
+
+        // Buscamos el anuncio y su dueño
+        $anuncio = Anuncio::with('usuario')->findOrFail($idAnuncio);
+
+        // Preparamos los datos de quien envía el mensaje (el usuario logueado)
+        $datosInteresado = [
+            'nombre' => $peticion->user()->name,
+            'email' => $peticion->user()->email,
+            'mensaje' => $datosValidados['mensaje'],
+        ];
+
+        // Enviamos el correo al dueño del anuncio
+        // (En local se guardará en storage/logs/laravel.log si usas MAIL_MAILER=log)
+        Mail::to($anuncio->usuario->email)->send(new AvisoInteresado($anuncio, $datosInteresado));
+
+        return redirect()->back()->with('exito', '¡Mensaje enviado correctamente al vendedor!');
     }
 }

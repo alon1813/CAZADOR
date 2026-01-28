@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\JornadaController;
 use App\Http\Controllers\MercadoController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\BlogController;
 
 Route::get('/', function () {
     return Auth::check() ? redirect()->route('dashboard') : redirect()->route('login');
@@ -41,6 +42,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Rutas para el Mercado
     Route::get('/mercado', [MercadoController::class, 'index'])->name('mercado.index');
     Route::post('/mercado', [MercadoController::class, 'store'])->name('mercado.store');
+    Route::post('/mercado/{id}/contactar', [MercadoController::class, 'contactarVendedor'])->name('mercado.contactar');
 });
+
+
+// Rutas Públicas del Blog
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 require __DIR__.'/auth.php';

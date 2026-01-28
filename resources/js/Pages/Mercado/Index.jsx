@@ -3,7 +3,30 @@ import { Head, useForm, Link } from '@inertiajs/react';
 //import { Link } from '@inertiajs/react';
 
 export default function Index({ auth, anuncios, filtros }) {
-    const [mostrarModal, setMostrarModal] = useState(false);
+    
+    const [mostrarModalCrear, setMostrarModalCrear] = useState(false); // Renombrado para claridad
+    
+    // --- NUEVO: Estados para el contacto ---
+    const [anuncioAContactar, setAnuncioAContactar] = useState(null);
+    const { data: datosContacto, setData: setDatosContacto, post: enviarContacto, processing: enviandoContacto, reset: limpiarContacto, errors: erroresContacto } = useForm({
+        mensaje: ''
+    });
+
+    const abrirModalContacto = (anuncio) => {
+        setAnuncioAContactar(anuncio);
+        setDatosContacto('mensaje', `Hola, estoy interesado en tu ${anuncio.titulo}. ¿Sigue disponible?`);
+    };
+
+    const enviarFormularioContacto = (e) => {
+        e.preventDefault();
+        enviarContacto(route('mercado.contactar', anuncioAContactar.id), {
+            onSuccess: () => {
+                limpiarContacto();
+                setAnuncioAContactar(null);
+                alert('Mensaje enviado con éxito'); // Opcional: Feedback visual
+            }
+        });
+    };
     
     // Formulario para publicar
     const { data, setData, post, processing, reset, errors } = useForm({
@@ -46,6 +69,7 @@ export default function Index({ auth, anuncios, filtros }) {
                         <Link href={route('diario.index')} className="text-white text-sm font-medium hover:text-primary transition-colors">Diario</Link>
                         <Link href={route('armeria.index')} className="text-white text-sm font-medium hover:text-primary transition-colors">Armería</Link>
                         <Link href={route('mercado.index')} className="text-white text-sm font-medium hover:text-primary transition-colors">Mercado</Link>
+                        <Link href={route('blog.index')} className="text-white text-sm font-medium hover:text-primary transition-colors">Comunidad</Link>
                     </nav>
 
                     {/* AVATAR QUE LLEVA AL PERFIL */}
@@ -142,7 +166,10 @@ export default function Index({ auth, anuncios, filtros }) {
                                                     </div>
                                                     <span className="text-white text-xs font-bold">{anuncio.usuario.name}</span>
                                                 </div>
-                                                <button className="bg-[#152211] hover:bg-primary hover:text-black text-white text-xs font-bold py-1.5 px-3 rounded border border-border-dark transition-colors">
+                                                <button 
+                                                    onClick={() => abrirModalContacto(anuncio)}
+                                                    className="bg-[#152211] hover:bg-primary hover:text-black text-white text-xs font-bold py-1.5 px-3 rounded border border-border-dark transition-colors"
+                                                >
                                                     Contactar
                                                 </button>
                                             </div>
@@ -217,6 +244,56 @@ export default function Index({ auth, anuncios, filtros }) {
                             <div className="md:col-span-2 flex justify-end gap-3 pt-4 border-t border-border-dark">
                                 <button type="button" onClick={() => setMostrarModal(false)} className="px-4 py-2 text-white font-bold hover:bg-white/5 rounded-lg">Cancelar</button>
                                 <button type="submit" disabled={processing} className="px-6 py-2 bg-primary text-black font-bold rounded-lg hover:bg-primary-dark shadow-lg shadow-primary/20">Publicar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+            )}
+            {/* --- MODAL DE CONTACTO --- */}
+            {anuncioAContactar && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+                    <div className="bg-surface-dark border border-border-dark rounded-xl w-full max-w-md p-6 shadow-2xl animate-fade-in-up">
+                        <div className="flex justify-between items-center mb-4 border-b border-border-dark pb-4">
+                            <h3 className="text-white text-lg font-bold">Contactar Vendedor</h3>
+                            <button onClick={() => setAnuncioAContactar(null)} className="text-text-muted hover:text-white">
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        
+                        <div className="mb-4">
+                            <p className="text-sm text-text-muted">Estás contactando a <span className="text-white font-bold">{anuncioAContactar.usuario.name}</span> por el artículo:</p>
+                            <div className="mt-2 p-3 bg-background-dark rounded border border-border-dark flex items-center gap-3">
+                                {anuncioAContactar.imagen_ruta ? (
+                                    <img src={`/storage/${anuncioAContactar.imagen_ruta}`} className="size-12 object-cover rounded" />
+                                ) : (
+                                    <div className="size-12 bg-gray-800 rounded flex items-center justify-center"><span className="material-symbols-outlined text-xs">image</span></div>
+                                )}
+                                <div>
+                                    <p className="text-white font-bold text-sm">{anuncioAContactar.titulo}</p>
+                                    <p className="text-primary font-bold text-xs">{anuncioAContactar.precio}€</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form onSubmit={enviarFormularioContacto} className="flex flex-col gap-4">
+                            <div>
+                                <label className="text-white text-sm font-bold mb-1 block">Tu Mensaje</label>
+                                <textarea 
+                                    className="w-full bg-background-dark border border-border-dark rounded-lg text-white h-32 focus:border-primary focus:ring-1 focus:ring-primary"
+                                    value={datosContacto.mensaje}
+                                    onChange={e => setDatosContacto('mensaje', e.target.value)}
+                                    placeholder="Escribe tu consulta aquí..."
+                                ></textarea>
+                                <span className="text-red-500 text-xs">{erroresContacto.mensaje}</span>
+                            </div>
+
+                            <div className="flex justify-end gap-3 pt-2">
+                                <button type="button" onClick={() => setAnuncioAContactar(null)} className="px-4 py-2 text-white font-bold hover:bg-white/5 rounded-lg text-sm">Cancelar</button>
+                                <button type="submit" disabled={enviandoContacto} className="px-6 py-2 bg-primary text-black font-bold rounded-lg hover:bg-primary-dark shadow-lg shadow-primary/20 text-sm flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-sm">send</span>
+                                    Enviar Mensaje
+                                </button>
                             </div>
                         </form>
                     </div>

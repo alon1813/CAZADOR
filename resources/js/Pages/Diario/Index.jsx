@@ -40,6 +40,7 @@ export default function Index({ auth, jornadas }) {
                         <Link href={route('diario.index')} className="text-white text-sm font-medium hover:text-primary transition-colors">Diario</Link>
                         <Link href={route('armeria.index')} className="text-white text-sm font-medium hover:text-primary transition-colors">Armería</Link>
                         <Link href={route('mercado.index')} className="text-white text-sm font-medium hover:text-primary transition-colors">Mercado</Link>
+                        <Link href={route('blog.index')} className="text-white text-sm font-medium hover:text-primary transition-colors">Blog</Link>
                     </nav>
 
                     {/* AVATAR QUE LLEVA AL PERFIL */}
@@ -115,11 +116,28 @@ export default function Index({ auth, jornadas }) {
                                         </div>
                                     </div>
                                     
+                                    {/* Parte inferior de la tarjeta */}
                                     <div className="border-t border-border-green mt-4 pt-3 flex justify-between items-center text-xs text-text-muted">
-                                        <span className="flex items-center gap-1">
-                                            <span className="material-symbols-outlined text-sm">cloud</span>
-                                            --°C
-                                        </span>
+                                        
+                                        {/* MOSTRAR CLIMA SI EXISTE */}
+                                        {jornada.datos_climaticos ? (
+                                            <span className="flex items-center gap-2" title={jornada.datos_climaticos.descripcion}>
+                                                {/* Icono desde OpenWeather */}
+                                                <img 
+                                                    src={`https://openweathermap.org/img/wn/${jornada.datos_climaticos.icono}.png`} 
+                                                    alt="clima" 
+                                                    className="w-6 h-6"
+                                                />
+                                                <span className="font-bold text-white">{jornada.datos_climaticos.temp}°C</span>
+                                                <span className="hidden sm:inline">• {jornada.datos_climaticos.viento} km/h Viento</span>
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center gap-1">
+                                                <span className="material-symbols-outlined text-sm">cloud_off</span>
+                                                Sin datos clima
+                                            </span>
+                                        )}
+
                                         <span className="font-mono">ID: #{jornada.id.toString().padStart(4, '0')}</span>
                                     </div>
                                 </div>
